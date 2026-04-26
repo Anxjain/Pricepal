@@ -1,0 +1,1021 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PricePal — Compare Before You Order</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:ital,wght@0,300;0,400;0,500;1,300&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #0a0a0f;
+    --surface: #111118;
+    --surface2: #1a1a24;
+    --border: rgba(255,255,255,0.07);
+    --accent: #f5c842;
+    --accent2: #ff6b35;
+    --green: #4ade80;
+    --text: #f0f0f0;
+    --muted: #888;
+    --zomato: #e23744;
+    --swiggy: #fc8019;
+    --uber: #000;
+    --ola: #4caf50;
+    --rapido: #1e3a8a;
+    --r: 12px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    min-height: 100vh;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── PAGE WRAPPERS ── */
+  .page { min-height: 100vh; display: flex; flex-direction: column; }
+
+  /* ── NAV ── */
+  nav {
+    padding: 18px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+    position: sticky;
+    top: 0;
+    background: rgba(10,10,15,0.85);
+    backdrop-filter: blur(16px);
+    z-index: 100;
+  }
+  .logo {
+    font-family: 'Syne', sans-serif;
+    font-size: 20px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    color: var(--accent);
+  }
+  .logo span { color: var(--text); }
+
+  /* ── HOME PAGE ── */
+  .home-hero {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 60px 24px 80px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .home-hero::before {
+    content: '';
+    position: absolute;
+    top: -120px; left: 50%;
+    transform: translateX(-50%);
+    width: 600px; height: 600px;
+    background: radial-gradient(ellipse, rgba(245,200,66,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .hero-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(245,200,66,0.1);
+    border: 1px solid rgba(245,200,66,0.2);
+    border-radius: 100px;
+    padding: 5px 14px;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--accent);
+    margin-bottom: 28px;
+    letter-spacing: 0.3px;
+  }
+
+  h1 {
+    font-family: 'Syne', sans-serif;
+    font-size: clamp(36px, 6vw, 64px);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -2px;
+    margin-bottom: 16px;
+    max-width: 640px;
+  }
+  h1 em { color: var(--accent); font-style: normal; }
+
+  .hero-sub {
+    color: var(--muted);
+    font-size: 16px;
+    max-width: 400px;
+    line-height: 1.6;
+    margin-bottom: 48px;
+    font-weight: 300;
+  }
+
+  /* Mode selector */
+  .mode-cards {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    width: 100%;
+    max-width: 520px;
+  }
+  .mode-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    padding: 24px 20px;
+    cursor: pointer;
+    transition: all 0.2s;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .mode-card:hover {
+    border-color: var(--accent);
+    background: var(--surface2);
+    transform: translateY(-2px);
+  }
+  .mode-card.active {
+    border-color: var(--accent);
+    background: rgba(245,200,66,0.05);
+  }
+  .mode-icon { font-size: 28px; }
+  .mode-label {
+    font-family: 'Syne', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .mode-desc { font-size: 12px; color: var(--muted); line-height: 1.4; }
+
+  /* Location + search form */
+  .search-form {
+    width: 100%;
+    max-width: 520px;
+    margin-top: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .input-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+  .input-icon {
+    position: absolute;
+    left: 14px;
+    color: var(--muted);
+    font-size: 16px;
+  }
+  input {
+    width: 100%;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    padding: 14px 14px 14px 42px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  input:focus { border-color: var(--accent); }
+  input::placeholder { color: var(--muted); }
+
+  .btn {
+    background: var(--accent);
+    color: #0a0a0f;
+    border: none;
+    border-radius: var(--r);
+    padding: 14px 24px;
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    letter-spacing: -0.3px;
+  }
+  .btn:hover:not(:disabled) { filter: brightness(1.1); transform: translateY(-1px); }
+  .btn:active { transform: translateY(0); }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-ghost {
+    background: transparent;
+    color: var(--text);
+    border: 1px solid var(--border);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 400;
+    font-size: 13px;
+    padding: 8px 16px;
+  }
+  .btn-ghost:hover { border-color: var(--muted); }
+
+  /* ── RESULTS PAGE ── */
+  .results-page {
+    flex: 1;
+    padding: 24px;
+    max-width: 720px;
+    margin: 0 auto;
+    width: 100%;
+  }
+  .results-header {
+    margin-bottom: 28px;
+  }
+  .results-header h2 {
+    font-family: 'Syne', sans-serif;
+    font-size: 24px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    margin-bottom: 4px;
+  }
+  .results-header p {
+    color: var(--muted);
+    font-size: 13px;
+  }
+
+  /* Savings banner */
+  .savings-banner {
+    background: rgba(74,222,128,0.08);
+    border: 1px solid rgba(74,222,128,0.2);
+    border-radius: var(--r);
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    color: var(--green);
+    font-weight: 500;
+  }
+  .savings-icon { font-size: 20px; }
+
+  /* Platform cards */
+  .platform-cards {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .platform-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    padding: 20px;
+    transition: all 0.2s;
+    position: relative;
+    overflow: hidden;
+  }
+  .platform-card.best {
+    border-color: var(--accent);
+    background: rgba(245,200,66,0.04);
+  }
+  .platform-card.best::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: var(--accent);
+  }
+
+  .card-top {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .platform-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .platform-logo {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    font-weight: 800;
+    font-family: 'Syne', sans-serif;
+    flex-shrink: 0;
+  }
+  .platform-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 17px;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+  }
+  .platform-confidence {
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+
+  .best-badge {
+    background: var(--accent);
+    color: #0a0a0f;
+    font-size: 11px;
+    font-weight: 700;
+    font-family: 'Syne', sans-serif;
+    padding: 4px 10px;
+    border-radius: 100px;
+    letter-spacing: 0.2px;
+  }
+
+  .card-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .stat {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .stat-label {
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .stat-value {
+    font-size: 20px;
+    font-family: 'Syne', sans-serif;
+    font-weight: 700;
+    letter-spacing: -0.5px;
+  }
+  .stat-value.total { color: var(--accent); }
+  .stat-sub {
+    font-size: 11px;
+    color: var(--muted);
+  }
+
+  .card-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .disclaimer-tag {
+    font-size: 11px;
+    color: var(--muted);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .open-btn {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 8px 16px;
+    color: var(--text);
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.15s;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .open-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .open-btn.best-btn {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: #0a0a0f;
+  }
+  .open-btn.best-btn:hover { filter: brightness(1.1); }
+
+  /* Cab-specific: category breakdown */
+  .cab-categories {
+    margin: 12px 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .cab-type {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 5px 10px;
+    font-size: 12px;
+    display: flex;
+    gap: 6px;
+  }
+  .cab-type-name { color: var(--muted); }
+  .cab-type-price { font-weight: 600; color: var(--text); }
+
+  /* Skeleton loader */
+  @keyframes shimmer {
+    0% { background-position: -400px 0; }
+    100% { background-position: 400px 0; }
+  }
+  .skeleton {
+    background: linear-gradient(90deg, var(--surface) 25%, var(--surface2) 50%, var(--surface) 75%);
+    background-size: 800px 100%;
+    animation: shimmer 1.4s ease infinite;
+    border-radius: 8px;
+  }
+  .skeleton-card {
+    height: 140px;
+    border-radius: var(--r);
+  }
+
+  /* Error state */
+  .error-state {
+    text-align: center;
+    padding: 60px 24px;
+  }
+  .error-icon { font-size: 40px; margin-bottom: 12px; }
+  .error-state h3 {
+    font-family: 'Syne', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .error-state p { color: var(--muted); font-size: 14px; margin-bottom: 24px; }
+
+  /* Partial data warning */
+  .partial-warning {
+    background: rgba(255,107,53,0.08);
+    border: 1px solid rgba(255,107,53,0.2);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 12px;
+    color: var(--accent2);
+    margin-bottom: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  /* Disclaimer */
+  .global-disclaimer {
+    margin-top: 32px;
+    padding: 14px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.6;
+    text-align: center;
+  }
+
+  /* Tabs */
+  .tabs {
+    display: flex;
+    gap: 4px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--r);
+    padding: 4px;
+    margin-bottom: 20px;
+  }
+  .tab {
+    flex: 1;
+    padding: 10px;
+    border-radius: 8px;
+    border: none;
+    background: transparent;
+    color: var(--muted);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-weight: 500;
+  }
+  .tab.active {
+    background: var(--surface2);
+    color: var(--text);
+  }
+
+  @media (max-width: 480px) {
+    .mode-cards { grid-template-columns: 1fr 1fr; }
+    .card-stats { grid-template-columns: repeat(3, 1fr); }
+    .stat-value { font-size: 17px; }
+    h1 { font-size: 36px; letter-spacing: -1.5px; }
+  }
+</style>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/babel-standalone/7.23.5/babel.min.js"></script>
+
+<script type="text/babel">
+const { useState, useEffect, useCallback } = React;
+
+// ── MOCK DATA (replace with real API calls) ──────────────────────────────────
+
+const MOCK_FOOD_RESULTS = {
+  query: { restaurant: 'Domino\'s Pizza', location: 'Gurgaon' },
+  results: [
+    {
+      platform: 'Zomato',
+      restaurantName: "Domino's Pizza",
+      avgItemPrice: 250,
+      deliveryFee: 25,
+      totalEstimatedPrice: 275,
+      eta: '28–38 min',
+      rating: '3.9',
+      deeplink: 'https://www.zomato.com/',
+      dataSource: 'api',
+      confidence: 'high',
+      priceBuffer: '±5%',
+      isBest: false,
+    },
+    {
+      platform: 'Swiggy',
+      restaurantName: "Domino's Pizza",
+      avgItemPrice: 250,
+      deliveryFee: 40,
+      totalEstimatedPrice: 290,
+      eta: '30–45 min',
+      rating: '4.1',
+      deeplink: 'https://www.swiggy.com/',
+      dataSource: 'api',
+      confidence: 'medium',
+      priceBuffer: '±15%',
+      isBest: false,
+    }
+  ],
+  savings: { amount: 15, message: 'Save ₹15 by ordering on Zomato', percentageSaved: 5 },
+  partial: false,
+  disclaimer: 'Prices are estimated and may vary slightly at checkout.'
+};
+
+const MOCK_CAB_RESULTS = {
+  query: { pickup: 'Cyber City, Gurgaon', drop: 'Connaught Place, Delhi' },
+  route: { distanceKm: 26, durationMin: 45, distanceText: '26 km', durationText: '45 min' },
+  results: [
+    {
+      platform: 'Uber',
+      categories: [
+        { type: 'UberGo', estimatedPrice: 380, priceMin: 350, priceMax: 410 },
+        { type: 'Premier', estimatedPrice: 550, priceMin: 510, priceMax: 590 },
+      ],
+      price: 380,
+      priceRange: '₹350–₹410',
+      eta: '5 min',
+      surgeMultiplier: 1.0,
+      deeplink: 'https://m.uber.com/ul/',
+      dataSource: 'api',
+      confidence: 'high',
+      isBest: false,
+    },
+    {
+      platform: 'Ola',
+      categories: [
+        { type: 'Mini', estimatedPrice: 350, priceMin: 320, priceMax: 380 },
+        { type: 'Prime', estimatedPrice: 490, priceMin: 455, priceMax: 525 },
+        { type: 'Auto', estimatedPrice: 220, priceMin: 200, priceMax: 240 },
+      ],
+      price: 350,
+      priceRange: '₹320–₹380',
+      eta: '7 min',
+      surgeMultiplier: 1.0,
+      deeplink: 'https://book.olacabs.com/',
+      dataSource: 'estimated',
+      confidence: 'medium',
+      isBest: false,
+    },
+    {
+      platform: 'Rapido',
+      categories: [
+        { type: 'Bike', estimatedPrice: 180, priceMin: 165, priceMax: 195 },
+        { type: 'Auto', estimatedPrice: 240, priceMin: 220, priceMax: 260 },
+        { type: 'Cab', estimatedPrice: 320, priceMin: 295, priceMax: 345 },
+      ],
+      price: 180,
+      priceRange: '₹165–₹195',
+      eta: '4 min',
+      surgeMultiplier: 1.0,
+      deeplink: 'https://rapido.bike/',
+      dataSource: 'estimated',
+      confidence: 'medium',
+      isBest: false,
+    }
+  ],
+  savings: { amount: 200, message: 'Rapido Bike is ₹200 cheaper than Uber', percentageSaved: 53 },
+  partial: false,
+  disclaimer: 'Cab prices are estimates based on base rates. Actual fare may vary with surge.'
+};
+
+// Mark best in mock data
+function applyBest(results) {
+  if (!results?.length) return results;
+  const sorted = [...results].sort((a, b) => (a.totalEstimatedPrice || a.price) - (b.totalEstimatedPrice || b.price));
+  return results.map(r => ({
+    ...r,
+    isBest: (r.totalEstimatedPrice || r.price) === (sorted[0].totalEstimatedPrice || sorted[0].price)
+  }));
+}
+
+MOCK_FOOD_RESULTS.results = applyBest(MOCK_FOOD_RESULTS.results);
+MOCK_CAB_RESULTS.results = applyBest(MOCK_CAB_RESULTS.results);
+
+// ── PLATFORM COLORS / ICONS ──────────────────────────────────────────────────
+
+const PLATFORM_STYLE = {
+  Zomato:  { bg: '#e23744', letter: 'Z', emoji: '🔴' },
+  Swiggy:  { bg: '#fc8019', letter: 'S', emoji: '🟠' },
+  Uber:    { bg: '#222',    letter: 'U', emoji: '⚫' },
+  Ola:     { bg: '#4caf50', letter: 'O', emoji: '🟢' },
+  Rapido:  { bg: '#1e3a8a', letter: 'R', emoji: '🔵' },
+};
+
+// ── COMPONENTS ────────────────────────────────────────────────────────────────
+
+function Nav({ onBack }) {
+  return (
+    <nav>
+      <div className="logo">Price<span>Pal</span></div>
+      {onBack && (
+        <button className="btn btn-ghost" onClick={onBack}>← Back</button>
+      )}
+    </nav>
+  );
+}
+
+function SkeletonCard() {
+  return <div className="skeleton skeleton-card" />;
+}
+
+function ConfidenceDot({ level }) {
+  const color = level === 'high' ? '#4ade80' : level === 'medium' ? '#facc15' : '#888';
+  return (
+    <span style={{
+      display: 'inline-block',
+      width: 6, height: 6,
+      background: color,
+      borderRadius: '50%',
+      marginRight: 4,
+    }} />
+  );
+}
+
+function FoodCard({ result }) {
+  const style = PLATFORM_STYLE[result.platform] || { bg: '#444', letter: '?' };
+
+  return (
+    <div className={`platform-card ${result.isBest ? 'best' : ''}`}>
+      <div className="card-top">
+        <div className="platform-info">
+          <div className="platform-logo" style={{ background: style.bg, color: '#fff' }}>
+            {style.letter}
+          </div>
+          <div>
+            <div className="platform-name">{result.platform}</div>
+            <div className="platform-confidence">
+              <ConfidenceDot level={result.confidence} />
+              {result.dataSource === 'api' ? 'Live data' : 'Estimated'} · {result.priceBuffer}
+            </div>
+          </div>
+        </div>
+        {result.isBest && <div className="best-badge">✦ BEST DEAL</div>}
+      </div>
+
+      <div className="card-stats">
+        <div className="stat">
+          <div className="stat-label">Avg Item</div>
+          <div className="stat-value">₹{result.avgItemPrice}</div>
+          {result.rating && <div className="stat-sub">⭐ {result.rating}</div>}
+        </div>
+        <div className="stat">
+          <div className="stat-label">Delivery</div>
+          <div className="stat-value">{result.deliveryFee === 0 ? 'Free' : `₹${result.deliveryFee}`}</div>
+          <div className="stat-sub">fee</div>
+        </div>
+        <div className="stat">
+          <div className="stat-label">Total Est.</div>
+          <div className="stat-value total">₹{result.totalEstimatedPrice}</div>
+          <div className="stat-sub">{result.eta}</div>
+        </div>
+      </div>
+
+      <div className="card-footer">
+        <div className="disclaimer-tag">
+          ⚡ {result.eta}
+        </div>
+        <a
+          href={result.deeplink}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={`open-btn ${result.isBest ? 'best-btn' : ''}`}
+        >
+          Order on {result.platform} →
+        </a>
+      </div>
+    </div>
+  );
+}
+
+function CabCard({ result }) {
+  const style = PLATFORM_STYLE[result.platform] || { bg: '#444', letter: '?' };
+
+  return (
+    <div className={`platform-card ${result.isBest ? 'best' : ''}`}>
+      <div className="card-top">
+        <div className="platform-info">
+          <div className="platform-logo" style={{ background: style.bg, color: '#fff' }}>
+            {style.letter}
+          </div>
+          <div>
+            <div className="platform-name">{result.platform}</div>
+            <div className="platform-confidence">
+              <ConfidenceDot level={result.confidence} />
+              {result.dataSource === 'api' ? 'Live data' : 'Estimated'}
+              {result.surgeMultiplier > 1 && ` · ${result.surgeMultiplier}× surge`}
+            </div>
+          </div>
+        </div>
+        {result.isBest && <div className="best-badge">✦ BEST DEAL</div>}
+      </div>
+
+      {/* Category breakdown */}
+      {result.categories && result.categories.length > 0 && (
+        <div className="cab-categories">
+          {result.categories.map(cat => (
+            <div className="cab-type" key={cat.type}>
+              <span className="cab-type-name">{cat.type}</span>
+              <span className="cab-type-price">₹{cat.priceMin}–{cat.priceMax}</span>
+            </div>
+          ))}
+        </div>
+      )}
+
+      <div className="card-stats">
+        <div className="stat">
+          <div className="stat-label">Starting from</div>
+          <div className="stat-value total">₹{result.price}</div>
+          <div className="stat-sub">lowest option</div>
+        </div>
+        <div className="stat">
+          <div className="stat-label">Price Range</div>
+          <div className="stat-value" style={{ fontSize: 14, paddingTop: 4 }}>{result.priceRange}</div>
+        </div>
+        <div className="stat">
+          <div className="stat-label">Pickup ETA</div>
+          <div className="stat-value">{result.eta}</div>
+        </div>
+      </div>
+
+      <div className="card-footer">
+        <div className="disclaimer-tag">
+          🚗 {result.categories?.[0]?.type || 'Available'}
+        </div>
+        <a
+          href={result.deeplink}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={`open-btn ${result.isBest ? 'best-btn' : ''}`}
+        >
+          Book on {result.platform} →
+        </a>
+      </div>
+    </div>
+  );
+}
+
+// ── PAGES ────────────────────────────────────────────────────────────────────
+
+function HomePage({ onSearch }) {
+  const [mode, setMode] = useState('food');
+  const [location, setLocation] = useState('');
+  const [query, setQuery] = useState('');
+
+  const canSearch = location.trim() && query.trim();
+
+  const handleSearch = () => {
+    if (!canSearch) return;
+    onSearch({ mode, location, query });
+  };
+
+  return (
+    <div className="page">
+      <Nav />
+      <div className="home-hero">
+        <div className="hero-badge">🇮🇳 Built for India</div>
+        <h1>Stop overpaying.<br />Compare <em>before</em> you order.</h1>
+        <p className="hero-sub">
+          See prices across Zomato, Swiggy, Uber, Ola and Rapido in seconds.
+          Pick the cheapest. Go.
+        </p>
+
+        <div className="mode-cards">
+          <div
+            className={`mode-card ${mode === 'food' ? 'active' : ''}`}
+            onClick={() => { setMode('food'); setQuery(''); }}
+          >
+            <div className="mode-icon">🍔</div>
+            <div className="mode-label">Food Delivery</div>
+            <div className="mode-desc">Zomato vs Swiggy price comparison</div>
+          </div>
+          <div
+            className={`mode-card ${mode === 'cab' ? 'active' : ''}`}
+            onClick={() => { setMode('cab'); setQuery(''); }}
+          >
+            <div className="mode-icon">🚕</div>
+            <div className="mode-label">Cab Fares</div>
+            <div className="mode-desc">Uber vs Ola vs Rapido estimates</div>
+          </div>
+        </div>
+
+        <div className="search-form">
+          <div className="input-wrap">
+            <span className="input-icon">📍</span>
+            <input
+              type="text"
+              placeholder="Your city or area (e.g. Gurgaon, Sector 29)"
+              value={location}
+              onChange={e => setLocation(e.target.value)}
+            />
+          </div>
+
+          {mode === 'food' ? (
+            <div className="input-wrap">
+              <span className="input-icon">🔍</span>
+              <input
+                type="text"
+                placeholder="Restaurant name (e.g. Domino's, Biryani Blues)"
+                value={query}
+                onChange={e => setQuery(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && handleSearch()}
+              />
+            </div>
+          ) : (
+            <div className="input-wrap">
+              <span className="input-icon">🏁</span>
+              <input
+                type="text"
+                placeholder="Drop location (e.g. Connaught Place, Delhi)"
+                value={query}
+                onChange={e => setQuery(e.target.value)}
+                onKeyDown={e => e.key === 'Enter' && handleSearch()}
+              />
+            </div>
+          )}
+
+          <button className="btn" disabled={!canSearch} onClick={handleSearch}>
+            Compare Prices →
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function ResultsPage({ searchParams, onBack }) {
+  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState(null);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    // In production: call real API
+    // const fn = searchParams.mode === 'food' ? compareFood : compareCab;
+    // fn(searchParams.query, searchParams.location)...
+
+    // Mock: simulate network delay
+    const t = setTimeout(() => {
+      if (searchParams.mode === 'food') {
+        setData({
+          ...MOCK_FOOD_RESULTS,
+          query: { restaurant: searchParams.query, location: searchParams.location }
+        });
+      } else {
+        setData({
+          ...MOCK_CAB_RESULTS,
+          query: { pickup: searchParams.location, drop: searchParams.query }
+        });
+      }
+      setLoading(false);
+    }, 1600);
+
+    return () => clearTimeout(t);
+  }, [searchParams]);
+
+  const isFood = searchParams.mode === 'food';
+
+  const headerTitle = isFood
+    ? `${searchParams.query} in ${searchParams.location}`
+    : `${searchParams.location} → ${searchParams.query}`;
+
+  return (
+    <div className="page">
+      <Nav onBack={onBack} />
+      <div className="results-page">
+        <div className="results-header">
+          <h2>{isFood ? '🍔' : '🚕'} {headerTitle}</h2>
+          <p>{isFood ? 'Food delivery comparison' : 'Cab fare comparison'} · Updated just now</p>
+        </div>
+
+        {loading && (
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+            <SkeletonCard />
+            <SkeletonCard />
+            {!isFood && <SkeletonCard />}
+          </div>
+        )}
+
+        {error && (
+          <div className="error-state">
+            <div className="error-icon">⚠️</div>
+            <h3>Couldn't fetch results</h3>
+            <p>{error}</p>
+            <button className="btn" onClick={onBack}>Try again</button>
+          </div>
+        )}
+
+        {!loading && data && (
+          <>
+            {data.partial && (
+              <div className="partial-warning">
+                ⚠️ Only partial results available — one platform did not respond.
+              </div>
+            )}
+
+            {data.savings && (
+              <div className="savings-banner">
+                <span className="savings-icon">💰</span>
+                <span>{data.savings.message} ({data.savings.percentageSaved}% cheaper)</span>
+              </div>
+            )}
+
+            <div className="platform-cards">
+              {data.results.map(result =>
+                isFood
+                  ? <FoodCard key={result.platform} result={result} />
+                  : <CabCard key={result.platform} result={result} />
+              )}
+            </div>
+
+            {!isFood && data.route && (
+              <div style={{
+                marginTop: 16,
+                padding: '12px 16px',
+                background: 'var(--surface)',
+                border: '1px solid var(--border)',
+                borderRadius: 'var(--r)',
+                fontSize: 13,
+                color: 'var(--muted)',
+                display: 'flex',
+                gap: 20
+              }}>
+                <span>📏 Distance: <strong style={{color:'var(--text)'}}>{data.route.distanceText}</strong></span>
+                <span>⏱ Drive time: <strong style={{color:'var(--text)'}}>{data.route.durationText}</strong></span>
+              </div>
+            )}
+
+            <div className="global-disclaimer">
+              ⚠️ {data.disclaimer}
+            </div>
+          </>
+        )}
+      </div>
+    </div>
+  );
+}
+
+// ── APP ROOT ──────────────────────────────────────────────────────────────────
+
+function App() {
+  const [screen, setScreen] = useState('home');
+  const [searchParams, setSearchParams] = useState(null);
+
+  const handleSearch = (params) => {
+    setSearchParams(params);
+    setScreen('results');
+  };
+
+  const handleBack = () => {
+    setScreen('home');
+    setSearchParams(null);
+  };
+
+  if (screen === 'results' && searchParams) {
+    return <ResultsPage searchParams={searchParams} onBack={handleBack} />;
+  }
+
+  return <HomePage onSearch={handleSearch} />;
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>
